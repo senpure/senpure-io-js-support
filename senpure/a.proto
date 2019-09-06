@@ -1,0 +1,24 @@
+
+message BaseInfoCompany {
+    // 公司标识
+    required int32 value = 1;
+
+    // 公司名称
+    required int32 age = 2;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+message DF {
+    required int32 d = 1;
+    required BaseInfoCompany d2 = 2;
+}
