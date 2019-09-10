@@ -9,15 +9,6 @@ message BaseInfoCompany {
 }
 
 
-
-
-
-
-
-
-
-
-
 message DF {
     required int32 d = 1;
     required BaseInfoCompany d2 = 2;

@@ -1,5 +1,4 @@
 
-
 io.encodeZigZag32 = function (value) {
     return value << 1 ^ value >> 31;
 }
@@ -136,16 +135,32 @@ io.BufferOperator.prototype.writeVar64 = function (value) {
         }
     }
 }
+io.BufferOperator.prototype.writeBooleanField = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeByte(value ? 1 : 0);
+}
 io.BufferOperator.prototype.writeBoolean = function (value) {
     this.writeByte(value ? 1 : 0);
+}
+io.BufferOperator.prototype.writeSIntField = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeSInt(value);
 }
 io.BufferOperator.prototype.writeSInt = function (value) {
 
     this.writeVar32(io.encodeZigZag32(value));
 }
+io.BufferOperator.prototype.writeSLongField = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeSLong(value);
+}
 io.BufferOperator.prototype.writeSLong = function (value) {
 
     this.writeVar32(io.encodeZigZag64(value));
+}
+io.BufferOperator.prototype.writeSFixed32Field = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeSFixed32(value);
 }
 io.BufferOperator.prototype.writeSFixed32 = function (value) {
 
@@ -153,18 +168,33 @@ io.BufferOperator.prototype.writeSFixed32 = function (value) {
     this.buf.writeInt32BE(value, this.writerIndex);
     this.writerIndex += 4;
 }
-
+io.BufferOperator.prototype.writeSFixed64Field = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeSFixed64(value);
+}
 io.BufferOperator.prototype.writeSFixed64 = function (value) {
     this.ensureWritable(8);
     this.buf.writeBigInt64BE(value, this.writerIndex);
     this.writerIndex += 8;
 }
 
+
+io.BufferOperator.prototype.writeFloatField = function (tag, value) {
+
+    this.writeVar32(tag);
+    this.writeFloat(value);
+}
 io.BufferOperator.prototype.writeFloat = function (value) {
 
     this.ensureWritable(4);
     this.buf.writeFloatBE(value, this.writerIndex);
     this.writerIndex += 4;
+}
+
+io.BufferOperator.prototype.writeDoubleField = function (tag, value) {
+
+    this.writeVar32(tag);
+    this.writeDouble(value);
 }
 
 io.BufferOperator.prototype.writeDouble = function (value) {
@@ -173,14 +203,47 @@ io.BufferOperator.prototype.writeDouble = function (value) {
     this.buf.writeDoubleBE(value, this.writerIndex);
     this.writerIndex += 8;
 }
+io.BufferOperator.prototype.writeStringField = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeString(value);
+}
+
 
 io.BufferOperator.prototype.writeString = function (value) {
     var buf = Buffer.from(value, "utf-8");
     var length = buf.byteLength;
     this.writeVar32(length);
-    this.ensureWritable(8);
-    this.buf.copy(buf, 0, this.writerIndex);
+    this.ensureWritable(length);
+    buf.copy(this.buf, this.writerIndex);
+    this.writerIndex += length;
 
+}
+
+io.BufferOperator.prototype.readTag = function (endIndex) {
+    if (this.readerIndex == endIndex) {
+        return 0;
+    }
+    return this.readVar32();
+}
+io.BufferOperator.prototype.skipTag = function (tag) {
+    var tagWriteType=tag & 7;
+    switch (tagWriteType) {
+        case 0:
+            this.readVar64();
+            break;
+        case 1:
+            this.skipBytes(4);
+            break;
+        case 2:
+            this.skipBytes(8);
+            break;
+        case 3:
+            this.skipBytes(this.readVar32());
+            break;
+    }
+}
+io.BufferOperator.prototype.skipBytes = function (length) {
+    this.readerIndex += length;
 }
 
 io.BufferOperator.prototype.readByte = function () {

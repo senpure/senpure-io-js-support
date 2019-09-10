@@ -1,4 +1,7 @@
 require("./senpure/io.buffer")
+require("./senpure/io.consumer")
+require("./senpure/io.commputer")
+require("./senpure/msg")
 var net = require("net")
 var client = new net.Socket()
 //client.setEncoding('utf8');
@@ -41,24 +44,41 @@ client.on('data', function (data) {
             lastBufferOperator = bufferOperator;
             return;
         } else {
-            //console.debug("string:"+bufferOperator.readString());
+            var message = io.decodeMessage(bufferOperator, packageLength, bufferOperator.getReaderIndex() + packageLength);
+            if (message != null) {
 
-            var requestId = bufferOperator.readVar32();
+                console.debug(message.toString("    "));
+            }
+            //console.debug("string:"+bufferOperator.readString());
+            // var requestId = bufferOperator.readVar32();
             // console.debug("requestId:" + requestId);
-            var messageId = bufferOperator.readVar32();
+            //  var messageId = bufferOperator.readVar32();
             // console.debug("messageId:" + messageId);
-            bufferOperator.readVar32();
-            var success = bufferOperator.readBoolean();
-            bufferOperator.readVar32();
-            var str = bufferOperator.readString();
-            console.debug("success:" + success + ",str:" + str);
+            //  bufferOperator.readVar32();
+            //  var success = bufferOperator.readBoolean();
+            //  bufferOperator.readVar32();
+            //  var str = bufferOperator.readString();
+            //  console.debug("success:" + success + ",str:" + str);
         }
     }
     lastBufferOperator = null;
 });
 client.connect(8007, "127.0.0.1");
 
-client.write("aaa");
+var size = 65;
+var bus = new Array(size);
+for (var i = 0; i < size; i++) {
+    var str = new CSStrMessage();
+    str.message = "message" + i;
+    bus[i] = io.encodeMessage(str);
+    // client.write(io.encodeMessage(str));
+}
+//client.write(Buffer.concat(bus))
+var str = new CSStrMessage();
+str.message = "message10086";
+client.write(io.encodeMessage(str));
+
+//client.write("aaa");
 
 
 
