@@ -19,6 +19,10 @@ var b = Buffer.from("abc");
 console.debug(b)
 console.debug(b.toString("utf-8",1,2))
 
+Buffer.from()
 io.computeVar32Size()
 io.computeVar64FiledSize()
 io.computeVar32FiledSize()
+var s=new CSStrMessage();
+CSStrMessage.message
+

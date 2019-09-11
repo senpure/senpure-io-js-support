@@ -1,4 +1,3 @@
-
 io.encodeZigZag32 = function (value) {
     return value << 1 ^ value >> 31;
 }
@@ -112,6 +111,10 @@ io.BufferOperator.prototype.writeByte = function (value) {
     this.ensureWritable(1);
     this.buf.writeUInt8(value, this.writerIndex++);
 }
+io.BufferOperator.prototype.writeVar32Field = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeVar32(value);
+}
 io.BufferOperator.prototype.writeVar32 = function (value) {
     while (true) {
         if ((value & ~0x7F) == 0) {
@@ -123,7 +126,10 @@ io.BufferOperator.prototype.writeVar32 = function (value) {
         }
     }
 }
-
+io.BufferOperator.prototype.writeVar64Field = function (tag, value) {
+    this.writeVar32(tag);
+    this.writeVar64(value);
+}
 io.BufferOperator.prototype.writeVar64 = function (value) {
     while (true) {
         if ((value & ~0x7F) == 0) {
@@ -218,6 +224,11 @@ io.BufferOperator.prototype.writeString = function (value) {
     this.writerIndex += length;
 
 }
+io.BufferOperator.prototype.writeBeanField = function (tag, bean) {
+    this.writeVar32(tag);
+    this.writeVar32(bean.getSerializedSize());
+    bean.write(this);
+}
 
 io.BufferOperator.prototype.readTag = function (endIndex) {
     if (this.readerIndex == endIndex) {
@@ -226,7 +237,7 @@ io.BufferOperator.prototype.readTag = function (endIndex) {
     return this.readVar32();
 }
 io.BufferOperator.prototype.skipTag = function (tag) {
-    var tagWriteType=tag & 7;
+    var tagWriteType = tag & 7;
     switch (tagWriteType) {
         case 0:
             this.readVar64();
@@ -386,7 +397,10 @@ io.BufferOperator.prototype.readString = function () {
     this.readerIndex += value;
     return str;
 }
+io.BufferOperator.prototype.readBean = function (value) {
+    value.read(this, this.readVar32() + this.readerIndex());
 
+}
 
 //  var b = Buffer.alloc(4);
 // console.debug(b.toJSON())

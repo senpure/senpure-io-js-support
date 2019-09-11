@@ -1,5 +1,5 @@
-require("./senpure/io.buffer")
 require("./senpure/io.consumer")
+require("./senpure/io.buffer")
 require("./senpure/io.commputer")
 require("./senpure/msg")
 var net = require("net")
@@ -55,10 +55,10 @@ client.on('data', function (data) {
             //  var messageId = bufferOperator.readVar32();
             // console.debug("messageId:" + messageId);
             //  bufferOperator.readVar32();
-            //  var success = bufferOperator.readBoolean();
+            //  var _success = bufferOperator.readBoolean();
             //  bufferOperator.readVar32();
             //  var str = bufferOperator.readString();
-            //  console.debug("success:" + success + ",str:" + str);
+            //  console.debug("_success:" + _success + ",str:" + str);
         }
     }
     lastBufferOperator = null;

@@ -1,3 +1,6 @@
+if (typeof io == "undefined") {
+    io = {}
+}
 rightPad = function (str, length) {
     var strLength = str.length;
     for (var i = strLength; i < length; i++) {
@@ -6,9 +9,6 @@ rightPad = function (str, length) {
     return str;
 }
 
-if (typeof io == "undefined") {
-    io = {}
-}
 io.requestId = 1;
 io.nextRequestId = function () {
     var requestId = io.requestId + 1;
