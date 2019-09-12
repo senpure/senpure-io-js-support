@@ -9,7 +9,6 @@ declare namespace  CSStrMessage{
 declare  class CSStrMessage  extends io.Message{
     static MESSAGE_ID: number;
     constructor();
-    getMessageId2():number;
 }
 
 

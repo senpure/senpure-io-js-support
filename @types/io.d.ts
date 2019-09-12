@@ -1,8 +1,5 @@
 declare function rightPad(str: string, length: number): string;
 
-declare module 'io' {
-    export = io;
-}
 declare namespace io {
     /**
      * 生成一个请求唯一表示
@@ -64,9 +61,9 @@ declare namespace io {
 
         writeVar32Field(tag: number, value: number): void;
 
-        writeVar64(value: number): void;
+        writeVar64(value: bigint): void;
 
-        writeVar64Field(tag: number, value: number): void;
+        writeVar64Field(tag: number, value: bigint): void;
 
         writeBoolean(value: boolean): void;
 
@@ -76,17 +73,17 @@ declare namespace io {
 
         writeSIntField(tag: number, value: number): void;
 
-        writeSLong(value: number): void;
+        writeSLong(value: bigint): void;
 
-        writeSLongField(tag: number, value: number): void;
+        writeSLongField(tag: number, value:bigint): void;
 
         writeSFixed32(value: number): void;
 
         writeSFixed32Field(tag: number, value: number): void;
 
-        writeSFixed64(value: number): void;
+        writeSFixed64(value: bigint): void;
 
-        writeSFixed64Field(tag: number, value: number): void;
+        writeSFixed64Field(tag: number, value: bigint): void;
 
         writeFloat(value: number): void;
 
@@ -131,7 +128,7 @@ declare namespace io {
 
         readVar32(): number;
 
-        readVar64(): number;
+        readVar64(): bigint;
 
         readBoolean(): boolean;
 
@@ -139,11 +136,11 @@ declare namespace io {
 
         readSInt(): number;
 
-        readSLong(): number;
+        readSLong(): bigint;
 
         readSFixed32(): number;
 
-        readSFixed64(): number;
+        readSFixed64(): bigint;
 
         readFloat(): number;
 
@@ -151,7 +148,7 @@ declare namespace io {
 
         /**
          *读取数据填充一个空的bean
-         * @param bean 一个空的bean
+         * @param value 一个空的bean
          */
         readBean(value: Bean): void;
     }
@@ -183,11 +180,11 @@ declare namespace io {
 
     function encodeZigZag32(value: number): number;
 
-    function encodeZigZag64(value: number): number;
+    function encodeZigZag64(value: bigint): bigint;
 
     function decodeZigZag32(value: number): number;
 
-    function decodeZigZag64(value: number): number;
+    function decodeZigZag64(value: bigint): bigint;
 
     /**
      * 计算var32的byte大小
@@ -205,14 +202,14 @@ declare namespace io {
      * 计算var64的byte大小
      * @param value
      */
-    function computeVar64Size(value: number): number;
+    function computeVar64Size(value: bigint): number;
 
     /**
      *
      * @param tagVar32Size 已经经过计算的tag var32Size byte大小
      * @param value
      */
-    function computeVar64FiledSize(tagVar32Size: number, value: number): number;
+    function computeVar64FiledSize(tagVar32Size: number, value: bigint): number;
 
     /**
      * 计算boolean的byte大小
@@ -234,9 +231,9 @@ declare namespace io {
 
     function computeSFixed32FiledSize(tagVar32Size: number, value: number): number;
 
-    function computeSFixed64Size(value: number): number;
+    function computeSFixed64Size(value: bigint): number;
 
-    function computeSFixed64FiledSize(tagVar32Size: number, value: number): number;
+    function computeSFixed64FiledSize(tagVar32Size: number, value: bigint): number;
 
     function computeFloatSize(value: number): number;
 
