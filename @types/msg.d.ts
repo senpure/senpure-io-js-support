@@ -1,13 +1,20 @@
-
 ///<reference path="io.d.ts"/>
 
-declare namespace  CSStrMessage{
+declare namespace CSStrMessage {
 
-    class MessageDecoder extends io.MessageDecoder{
+    class MessageDecoder extends io.MessageDecoder {
     }
 }
-declare  class CSStrMessage  extends io.Message{
+
+declare class CSStrMessage extends io.Message {
     static MESSAGE_ID: number;
+
+    constructor();
+}
+
+declare class CSLongMessage extends io.Message {
+    static MESSAGE_ID: number;
+
     constructor();
 }
 

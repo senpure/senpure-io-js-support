@@ -34,16 +34,17 @@ io.encodeMessage = function (message) {
     var messageId = message.getMessageId();
     var headLength = io.computeVar32Size(requestId);
     headLength += io.computeVar32Size(messageId);
-    //  console.debug("requestId:" + requestId + ",messageId:" + messageId + ", headLength:" + headLength)
+      console.debug("requestId:" + requestId + ",messageId:" + messageId + ", headLength:" + headLength)
     var packageLength = headLength + message.getSerializedSize();
-    //console.debug("packageLength:" + packageLength)
+      console.debug("packageLength:" + packageLength)
     var bufNeedSize = io.computeVar32Size(packageLength) + packageLength;
-    // console.debug("bufNeedSize:" + bufNeedSize)
+     console.debug("bufNeedSize:" + bufNeedSize)
     var buf = io.BufferOperator.alloc(bufNeedSize);
     buf.writeVar32(packageLength);
     buf.writeVar32(requestId);
     buf.writeVar32(messageId)
     message.write(buf);
+    console.debug("writerIndex:"+buf.writerIndex)
     return buf.buf;
 }
 

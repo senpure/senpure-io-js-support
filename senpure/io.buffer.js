@@ -1,15 +1,11 @@
 io.encodeZigZag32 = function (value) {
     return value << 1 ^ value >> 31;
 };
-io.encodeZigZag64 = function (value) {
-    return value << 1 ^ value >> 63;
-};
+
 io.decodeZigZag32 = function (value) {
     return value >>> 1 ^ -(value & 1);
 };
-io.decodeZigZag64 = function (value) {
-    return value >>> 1 ^ -(value & 1);
-};
+
 io.BufferOperator = function (data) {
     this.buf = Buffer.from(data);
     this.writerIndex = this.buf.byteLength;
@@ -131,15 +127,16 @@ io.BufferOperator.prototype.writeVar64Field = function (tag, value) {
     this.writeVar64(value);
 };
 io.BufferOperator.prototype.writeVar64 = function (value) {
-    while (true) {
-        if ((value & ~0x7F) == 0) {
-            this.writeByte(value);
-            return;
-        } else {
-            this.writeByte((value & 0x7F) | 0x80);
-            value >>>= 7;
-        }
+    io.utils.splitInt64(value);
+    this.writeSplitVar64(io.utils.split64High, io.utils.split64Low);
+};
+io.BufferOperator.prototype.writeSplitVar64 = function (highBits, lowBits) {
+    while (highBits > 0 || lowBits > 127) {
+        this.writeByte((lowBits & 0x7F) | 0x80);
+        lowBits = ((lowBits >>> 7) | (highBits << 25)) >>> 0;
+        highBits = highBits >>> 7;
     }
+    this.writeByte(lowBits);
 };
 io.BufferOperator.prototype.writeBooleanField = function (tag, value) {
     this.writeVar32(tag);
@@ -148,39 +145,41 @@ io.BufferOperator.prototype.writeBooleanField = function (tag, value) {
 io.BufferOperator.prototype.writeBoolean = function (value) {
     this.writeByte(value ? 1 : 0);
 };
-io.BufferOperator.prototype.writeSIntField = function (tag, value) {
+io.BufferOperator.prototype.writeSintField = function (tag, value) {
     this.writeVar32(tag);
-    this.writeSInt(value);
+    this.writeSint(value);
 };
-io.BufferOperator.prototype.writeSInt = function (value) {
+io.BufferOperator.prototype.writeSint = function (value) {
 
     this.writeVar32(io.encodeZigZag32(value));
 };
-io.BufferOperator.prototype.writeSLongField = function (tag, value) {
+io.BufferOperator.prototype.writeSlongField = function (tag, value) {
     this.writeVar32(tag);
-    this.writeSLong(value);
+    this.writeSlong(value);
 };
-io.BufferOperator.prototype.writeSLong = function (value) {
-
-    this.writeVar32(io.encodeZigZag64(value));
+io.BufferOperator.prototype.writeSlong = function (value) {
+    io.utils.splitZigzag64(value);
+    this.writeSplitVar64(io.utils.split64High, io.utils.split64Low);
 };
-io.BufferOperator.prototype.writeSFixed32Field = function (tag, value) {
+io.BufferOperator.prototype.writeFixed32Field = function (tag, value) {
     this.writeVar32(tag);
-    this.writeSFixed32(value);
+    this.writeFixed32(value);
 };
-io.BufferOperator.prototype.writeSFixed32 = function (value) {
+io.BufferOperator.prototype.writeFixed32 = function (value) {
 
     this.ensureWritable(4);
     this.buf.writeInt32BE(value, this.writerIndex);
     this.writerIndex += 4;
 };
-io.BufferOperator.prototype.writeSFixed64Field = function (tag, value) {
+io.BufferOperator.prototype.writeFixed64Field = function (tag, value) {
     this.writeVar32(tag);
-    this.writeSFixed64(value);
+    this.writeFixed64(value);
 };
-io.BufferOperator.prototype.writeSFixed64 = function (value) {
+io.BufferOperator.prototype.writeFixed64 = function (value) {
     this.ensureWritable(8);
-    this.buf.writeBigInt64BE(value, this.writerIndex);
+    io.utils.splitInt64(value);
+    this.buf.writeUInt32BE(io.utils.split64High, this.writerIndex);
+    this.buf.writeUInt32BE(io.utils.split64Low, this.writerIndex + 4);
     this.writerIndex += 8;
 };
 
@@ -345,40 +344,56 @@ io.BufferOperator.prototype.readVar32 = function () {
     }
     return result;
 };
-
-io.BufferOperator.prototype.readVar64 = function () {
-    var shift = 0;
-    var result = 0;
-    while (shift < 64) {
-        var b = this.readByte();
-        result |= (b & 0x7F) << shift;
-        if ((b & 0x80) === 0) {
-            return result;
-        }
-        shift += 7;
+io.BufferOperator.prototype.readSplitVar64= function (convert)
+{
+    var temp = -1;
+    var lowBits = 0;
+    var highBits = 0;
+    for (var i = 0; i < 4 && temp < 0; i++) {
+        temp = this.readByte();
+        lowBits |= (temp & 0x7F) << (i * 7);
     }
-    return result;
+    if (temp < 0) {
+        temp = this.readByte();
+        lowBits |= (temp & 0x7F) << 28;
+        highBits |= (temp & 0x7F) >> 4;
+    }
+    if (temp < 0) {
+        for (var j = 0; j < 5 && temp < 0; j++) {
+            temp = this.readByte();
+            highBits |= (temp & 0x7F) << (j * 7 + 3);
+        }
+    }
+    // console.debug("highBits:" + highBits + ",lowBits:" + lowBits)
+    if (temp < 128) {
+        return convert(highBits >>> 0, lowBits >>> 0);
+    }
+    return 0;
+};
+io.BufferOperator.prototype.readVar64 = function () {
 
+    return this.readSplitVar64(io.utils.joinInt64);
 };
 io.BufferOperator.prototype.readBoolean = function () {
     return this.readByte() === 1;
 };
-io.BufferOperator.prototype.readSInt = function () {
+io.BufferOperator.prototype.readSint = function () {
     return io.decodeZigZag32(this.readVar32());
 };
-io.BufferOperator.prototype.readSLong = function () {
-    return io.decodeZigZag64(this.readVar64());
+io.BufferOperator.prototype.readSlong = function () {
+    return this.readSplitVar64(io.utils.joinZigzag64);
 };
 
-io.BufferOperator.prototype.readSFixed32 = function () {
+io.BufferOperator.prototype.readFixed32 = function () {
     var value = this.buf.readInt32BE(this.readerIndex);
     this.readerIndex += 4;
     return value;
 };
-io.BufferOperator.prototype.readSFixed64 = function () {
-    var value = this.buf.readBigInt64BE(this.readerIndex);
+io.BufferOperator.prototype.readFixed64 = function () {
+    var highBits = this.buf.readInt32BE(this.readerIndex);
+    var lowBits = this.buf.readInt32BE(this.readerIndex + 4);
     this.readerIndex += 8;
-    return value;
+    return io.utils.joinInt64(highBits, lowBits);
 };
 io.BufferOperator.prototype.readFloat = function () {
     var value = this.buf.readFloatBE(this.readerIndex);

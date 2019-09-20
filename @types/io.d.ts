@@ -61,29 +61,29 @@ declare namespace io {
 
         writeVar32Field(tag: number, value: number): void;
 
-        writeVar64(value: bigint): void;
+        writeVar64(value: number): void;
 
-        writeVar64Field(tag: number, value: bigint): void;
+        writeVar64Field(tag: number, value: number): void;
 
         writeBoolean(value: boolean): void;
 
         writeBooleanField(tag: number, value: boolean): void;
 
-        writeSInt(value: number): void;
+        writeSint(value: number): void;
 
-        writeSIntField(tag: number, value: number): void;
+        writeSintField(tag: number, value: number): void;
 
-        writeSLong(value: bigint): void;
+        writeSlong(value: number): void;
 
-        writeSLongField(tag: number, value:bigint): void;
+        writeSlongField(tag: number, value:number): void;
 
-        writeSFixed32(value: number): void;
+        writeFixed32(value: number): void;
 
-        writeSFixed32Field(tag: number, value: number): void;
+        writeFixed32Field(tag: number, value: number): void;
 
-        writeSFixed64(value: bigint): void;
+        writeFixed64(value: number): void;
 
-        writeSFixed64Field(tag: number, value: bigint): void;
+        writeFixed64Field(tag: number, value: number): void;
 
         writeFloat(value: number): void;
 
@@ -128,19 +128,19 @@ declare namespace io {
 
         readVar32(): number;
 
-        readVar64(): bigint;
+        readVar64(): number;
 
         readBoolean(): boolean;
 
         readString(): string;
 
-        readSInt(): number;
+        readSint(): number;
 
-        readSLong(): bigint;
+        readSlong(): number;
 
-        readSFixed32(): number;
+        readFixed32(): number;
 
-        readSFixed64(): bigint;
+        readFixed64(): number;
 
         readFloat(): number;
 
@@ -180,11 +180,11 @@ declare namespace io {
 
     function encodeZigZag32(value: number): number;
 
-    function encodeZigZag64(value: bigint): bigint;
+    function encodeZigZag64(value: number): number;
 
     function decodeZigZag32(value: number): number;
 
-    function decodeZigZag64(value: bigint): bigint;
+    function decodeZigZag64(value: number): number;
 
     /**
      * 计算var32的byte大小
@@ -202,14 +202,14 @@ declare namespace io {
      * 计算var64的byte大小
      * @param value
      */
-    function computeVar64Size(value: bigint): number;
+    function computeVar64Size(value: number): number;
 
     /**
      *
      * @param tagVar32Size 已经经过计算的tag var32Size byte大小
      * @param value
      */
-    function computeVar64FiledSize(tagVar32Size: number, value: bigint): number;
+    function computeVar64FiledSize(tagVar32Size: number, value: number): number;
 
     /**
      * 计算boolean的byte大小
@@ -219,21 +219,21 @@ declare namespace io {
 
     function computeBooleanFiledSize(tagVar32Size: number, value: boolean): number;
 
-    function computeSIntSize(value: number): number;
+    function computeSintSize(value: number): number;
 
-    function computeSIntFiledSize(tagVar32Size: number, value: number): number;
+    function computeSintFiledSize(tagVar32Size: number, value: number): number;
 
-    function computeSLongSize(value: number): number;
+    function computeSlongSize(value: number): number;
 
-    function computeSLongFiledSize(tagVar32Size: number, value: number): number;
+    function computeSlongFiledSize(tagVar32Size: number, value: number): number;
 
-    function computeSFixed32Size(value: number): number;
+    function computeFixed32Size(value: number): number;
 
-    function computeSFixed32FiledSize(tagVar32Size: number, value: number): number;
+    function computeFixed32FiledSize(tagVar32Size: number, value: number): number;
 
-    function computeSFixed64Size(value: bigint): number;
+    function computeFixed64Size(value: number): number;
 
-    function computeSFixed64FiledSize(tagVar32Size: number, value: bigint): number;
+    function computeFixed64FiledSize(tagVar32Size: number, value: number): number;
 
     function computeFloatSize(value: number): number;
 
