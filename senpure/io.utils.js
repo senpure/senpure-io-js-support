@@ -1,4 +1,4 @@
-io.BinaryConstants = {}
+io.BinaryConstants = {};
 io.BinaryConstants.FLOAT32_EPS = 1.401298464324817E-45;
 io.BinaryConstants.FLOAT32_MIN = 1.1754943508222875E-38;
 io.BinaryConstants.FLOAT32_MAX = 3.4028234663852886E38;
@@ -14,14 +14,13 @@ io.BinaryConstants.TWO_TO_53 = 9007199254740992;
 io.BinaryConstants.TWO_TO_56 = 0x100000000000000;
 io.BinaryConstants.TWO_TO_63 = 0x7fffffffffffffff;
 io.BinaryConstants.TWO_TO_64 = 1.8446744073709552E19;
-io.utils = {}
+io.utils = {};
 io.utils.split64Low = 0;
 io.utils.split64High = 0;
 
 io.utils.splitUint64 = function (value) {
     var lowBits = value >>> 0;
-    var highBits = Math.floor((value - lowBits) / io.BinaryConstants.TWO_TO_32) >>> 0;
-    io.utils.split64High = highBits;
+    io.utils.split64High = Math.floor((value - lowBits) / io.BinaryConstants.TWO_TO_32) >>> 0;
     io.utils.split64Low = lowBits;
 };
 
@@ -57,8 +56,8 @@ io.utils.splitZigzag64 = function (value) {
     var lowBits = io.utils.split64Low;
     var highBits = io.utils.split64High;
     if (sign) {
-        if (lowBits == 0) {
-            if (highBits == 0) {
+        if (lowBits === 0) {
+            if (highBits === 0) {
                 lowBits = 0xFFFFFFFF;
                 highBits = 0xFFFFFFFF;
             } else {
@@ -72,7 +71,7 @@ io.utils.splitZigzag64 = function (value) {
     io.utils.split64High = highBits;
     io.utils.split64Low = lowBits;
 
-}
+};
 
 io.utils.joinUint64 = function (highBits, lowBits) {
     return highBits * io.BinaryConstants.TWO_TO_32 + (lowBits >>> 0);
@@ -83,7 +82,7 @@ io.utils.joinInt64 = function (highBits, lowBits) {
     if (sign) {
         lowBits = (~lowBits + 1) >>> 0;
         highBits = ~highBits >>> 0;
-        if (lowBits == 0) {
+        if (lowBits === 0) {
             highBits = (highBits + 1) >>> 0;
         }
     }
@@ -91,11 +90,9 @@ io.utils.joinInt64 = function (highBits, lowBits) {
     return sign ? -result : result;
 };
 
-io.utils.joinZigzag64 = function (bitsHigh, bitsLow) {
-    var signFlipMask = -(bitsLow & 1);
-    bitsLow = ((bitsLow >>> 1) | (bitsHigh << 31)) ^ signFlipMask;
-    bitsHigh = (bitsHigh >>> 1) ^ signFlipMask;
-  //  var result = io.utils.joinUint64(bitsHigh, bitsLow);
-   // return signFlipMask ? -result : result;
-    return io.utils.joinInt64(bitsHigh, bitsLow);
-}
+io.utils.joinZigzag64 = function (highBits, lowBits) {
+    var signFlipMask = -(lowBits & 1);
+    lowBits = ((lowBits >>> 1) | (highBits << 31)) ^ signFlipMask;
+    highBits = (highBits >>> 1) ^ signFlipMask;
+    return io.utils.joinInt64(highBits, lowBits);
+};

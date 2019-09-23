@@ -23,6 +23,12 @@ io.BufferOperator.alloc = function (capacity) {
     v.writerIndex = 0;
     return v;
 };
+io.BufferOperator.allocUnsafe = function (capacity) {
+    var v = new io.BufferOperator(Buffer.allocUnsafe(capacity));
+    v.writerIndex = 0;
+    return v;
+};
+
 io.BufferOperator.prototype.writeData = function (data) {
     var dataBuf = Buffer.from(data);
     this.ensureWritable(data.length);
