@@ -96,19 +96,19 @@ io.computeFixed64FieldSize = function (tagVar32Size, value) {
 io.computeFixed64Size = function (value) {
     return 8;
 };
-io.computeSIntFieldSize = function (tagVar32Size, value) {
-    return tagVar32Size + io.computeSIntFieldSize(value);
+io.computeSintFieldSize = function (tagVar32Size, value) {
+    return tagVar32Size + io.computeSintSize(value);
 };
 
 
-io.computeSIntSize = function (value) {
+io.computeSintSize = function (value) {
     return io.computeVar32Size(io.encodeZigZag32(value));
 };
-io.computeSLongFieldSize = function (tagVar32Size, value) {
-    return tagVar32Size + io.computeSLongSize(value);
+io.computeSlongFieldSize = function (tagVar32Size, value) {
+    return tagVar32Size + io.computeSlongSize(value);
 };
 
-io.computeSLongSize = function (value) {
+io.computeSlongSize = function (value) {
     if (value >= -64 && value < 64) {
         return 1;
     } else if (value >= -8192 && value < 8192) {

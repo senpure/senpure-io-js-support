@@ -5,7 +5,7 @@
   "description": "888",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter dot"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "grunt": "^1.0.4",
+    "mocha": "^6.2.0",
     "name": "0.0.2"
   }
 }

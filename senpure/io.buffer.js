@@ -91,8 +91,8 @@ io.BufferOperator.prototype.resetReaderIndex = function () {
     this.readerIndex = this.markedReaderIndex;
 };
 io.BufferOperator.prototype.ensureWritable = function (length) {
-    if (length < 1) {
-        throw  new Error("扩张长度不能小于1")
+    if (length < 0) {
+        throw  new Error("扩张长度不能小于0")
     }
     var capacity = this.writerIndex + length;
     if (this.buf.byteLength >= capacity) {
