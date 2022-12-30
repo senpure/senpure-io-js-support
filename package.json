@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "grunt": "^1.0.4",
-    "mocha": "^6.2.0",
+    "mocha": "^10.2.0",
     "name": "0.0.2"
   }
 }
